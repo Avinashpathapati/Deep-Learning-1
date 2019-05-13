@@ -115,6 +115,99 @@ class cnn_min_batch_GD():
 			x = conv(x)
 		return x
 
+	def vgg(self, input_shape):
+		   # Build the network of vgg for 10 classes with massive dropout and weight decay as described in the paper.
+			
+		print('vgg')
+		print(input_shape)
+		model = Sequential()
+		weight_decay = 0.0005
+
+		model.add(Conv2D(64, (3, 3), padding='same',
+						 input_shape=input_shape,kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.3))
+
+		model.add(Conv2D(64, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+
+		model.add(Conv2D(128, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(128, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+
+		model.add(Conv2D(256, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(256, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(256, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+		model.add(Dropout(0.4))
+
+		model.add(Conv2D(512, (3, 3), padding='same',kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+		model.add(Dropout(0.5))
+
+		model.add(Flatten())
+		model.add(Dense(512,kernel_regularizer=regularizers.l2(weight_decay)))
+		model.add(Activation('relu'))
+		model.add(BatchNormalization())
+
+		model.add(Dropout(0.5))
+		model.add(Dense(10))
+		model.add(Activation('softmax'))
+
+		return model
+
 	def inception(self):
 		input_img = Input(shape = (32, 32, 3))
 		l_1 = Conv2D(64, (1,1), padding='same', activation='relu')(input_img)
@@ -127,6 +220,26 @@ class cnn_min_batch_GD():
 		output = Flatten()(output)
 		out    = Dense(10, activation='softmax')(output)
 		model = Model(inputs = input_img, outputs = out)
+		return model
+
+	def Alexnet(self, input_shape):
+		#K.set_image_dim_ordering('th')
+		model = Sequential()
+		# model.add(Conv2D(96,(3,3),strides=(1,1),input_shape=(32,32,3),padding='valid',activation='relu',kernel_initializer='uniform'))
+		model.add(Conv2D(96,(11,11),strides=(1,1),input_shape=input_shape,padding='same',activation='relu',kernel_initializer='uniform'))
+		model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
+		model.add(Conv2D(256,(5,5),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
+		model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
+		model.add(Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
+		model.add(Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
+		model.add(Conv2D(256,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
+		model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
+		model.add(Flatten())
+		model.add(Dense(4096,activation='relu'))
+		model.add(Dropout(0.5))
+		model.add(Dense(4096,activation='relu'))
+		model.add(Dropout(0.5))
+		model.add(Dense(10,activation='softmax'))
 		return model
 
 	def resnet_v1(self, input_shape, depth, num_classes=10):
@@ -203,58 +316,84 @@ class cnn_min_batch_GD():
 		model = Model(inputs=inputs, outputs=outputs)
 		return model
 	
-	def __init__(self, shape_inp, modelType):
+	def __init__(self, shape_inp, modelType, act_fun, data_reg):
 		if modelType == 'resnet':
+			print('resnet')
 			self.network = self.resnet_v1(input_shape=shape_inp, depth=20)
 			# base_model = ResNet50(include_top=False, weights=None, input_shape=(140,140,3), pooling=None)
 			# x = keras.layers.GlobalAveragePooling2D()(base_model.output)
 			# output = keras.layers.Dense(10, activation='softmax')(x)
 			# self.network = keras.models.Model(inputs=[base_model.input], outputs=[output])
 		elif modelType == 'incep':
-			base_model = self.inception()
-			x = keras.layers.GlobalAveragePooling2D()(base_model.output)
-			output = keras.layers.Dense(10, activation='softmax')(x)
-			self.network = keras.models.Model(inputs=[base_model.input], outputs=[output])
+			self.network = self.inception()
 			#self.network = applications.inception_v3.InceptionV3(include_top=False, weights=None, input_tensor=None, input_shape=(32,32,3), pooling=None, classes=10)
+		elif modelType == 'vgg':
+			#self.network = applications.vgg16.VGG16( weights=None, include_top=True, classes=10, input_shape=(32,32,3))
+			self.network = self.vgg(input_shape = shape_inp)
+		elif modelType == 'alexnet':
+			self.network = self.Alexnet(input_shape = shape_inp)
 		else :
+			if act_fun == 'relu':
+				activation = 'relu'
+			elif act_fun == 'elu':
+				activation = 'elu'
+			else:
+				activation = 'sigmoid'
+
 			weight_decay = 1e-4
 			self.network = Sequential()
-			print(shape_inp)
-			self.network.add(keras.layers.Conv2D(32, kernel_size=3, activation='elu', kernel_regularizer=regularizers.l2(weight_decay),input_shape=shape_inp))
-			self.network.add(BatchNormalization())
-			self.network.add(Dropout(0.2))
-			self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
-			self.network.add(keras.layers.Conv2D(64, kernel_size=3, activation='elu', kernel_regularizer=regularizers.l2(weight_decay)))
-			self.network.add(BatchNormalization())
-			self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
-			self.network.add(Dropout(0.2))
+			if data_reg == 'true':
+				self.network.add(keras.layers.Conv2D(32, kernel_size=3, activation=activation, kernel_regularizer=regularizers.l2(weight_decay),input_shape=shape_inp))
+				self.network.add(BatchNormalization())
+				self.network.add(Dropout(0.2))
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+				self.network.add(keras.layers.Conv2D(64, kernel_size=3, activation=activation, kernel_regularizer=regularizers.l2(weight_decay)))
+				self.network.add(BatchNormalization())
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+				self.network.add(Dropout(0.2))
 
-			self.network.add(keras.layers.Conv2D(128, kernel_size=3, activation='elu', kernel_regularizer=regularizers.l2(weight_decay)))
-			self.network.add(BatchNormalization())
-			self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
-			self.network.add(Dropout(0.3))
+				self.network.add(keras.layers.Conv2D(128, kernel_size=3, activation=activation, kernel_regularizer=regularizers.l2(weight_decay)))
+				self.network.add(BatchNormalization())
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+				self.network.add(Dropout(0.3))
 
-			self.network.add(keras.layers.Flatten())
-			self.network.add(keras.layers.Dense(512, activation='elu'))
-			self.network.add(keras.layers.Dense(10, activation='softmax'))
+				self.network.add(keras.layers.Flatten())
+				self.network.add(keras.layers.Dense(512, activation=activation))
+				self.network.add(keras.layers.Dense(10, activation='softmax'))
+
+			else:
+				self.network.add(keras.layers.Conv2D(32, kernel_size=3, activation=activation,input_shape=shape_inp))
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+				self.network.add(keras.layers.Conv2D(64, kernel_size=3, activation=activation))
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+
+				self.network.add(keras.layers.Conv2D(128, kernel_size=3, activation=activation))
+				self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
+
+				self.network.add(keras.layers.Flatten())
+				self.network.add(keras.layers.Dense(512, activation=activation))
+				self.network.add(keras.layers.Dense(10, activation='softmax'))
 
 if __name__ == "__main__":
 	#commandline arguments reading
 	parser = OptionParser()
 	parser.add_option("-m", "--model",
-                  action="store", type="string", dest="model")
+				  action="store", type="string", dest="model")
 
 	parser.add_option("-o", "--opt",
-                  action="store", type="string", dest="opt")
+				  action="store", type="string", dest="opt")
 
 	parser.add_option("-a", "--act",
-                  action="store", type="string", dest="act")
+				  action="store", type="string", dest="act")
 
 	parser.add_option("-u", "--data_aug",
-                  action="store", type="string", dest="data_aug")
+				  action="store", type="string", dest="data_aug")
+
+	parser.add_option("-r", "--data_reg",
+				  action="store", type="string", dest="data_reg")
+
 
 	(options, args) = parser.parse_args()
-	print(options)
 
 
 	batch_size = 64
@@ -270,16 +409,14 @@ if __name__ == "__main__":
 	print('x_train shape:', x_train.shape[1:])
 	print(x_train.shape[0], 'train samples')
 	print(x_test.shape[0], 'test samples')
-	print(y_train.shape, 'label samples')
 
 	
 
 	# Convert class vectors to binary class matrices.
 	y_train = keras.utils.to_categorical(y_train, num_classes)
-	print(y_train.shape)
 	y_test = keras.utils.to_categorical(y_test, num_classes)
 
-	mbg = cnn_min_batch_GD(x_train.shape[1:], options.model)
+	mbg = cnn_min_batch_GD(x_train.shape[1:], options.model, options.act, options.data_reg)
 	
 	if options.opt == 'sgd':
 		opt = keras.optimizers.SGD(lr=0.001, decay=1e-6)
@@ -301,11 +438,11 @@ if __name__ == "__main__":
 	x_train /= 255
 	x_test /= 255
 	if options.data_aug == 'false':
-		model.fit(x_train, y_train,
-              batch_size=batch_size,
-              epochs=125,
-              validation_data=(x_test, y_test),
-              shuffle=True)
+		history = mbg.network.fit(x_train, y_train,
+			  batch_size=batch_size,
+			  epochs=125,
+			  validation_data=(x_test, y_test),
+			  shuffle=True)
 	else:
 		datagen = ImageDataGenerator(
 		rotation_range=15,
