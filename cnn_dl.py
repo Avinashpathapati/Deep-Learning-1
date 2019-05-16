@@ -225,9 +225,9 @@ class cnn_min_batch_GD():
 	def Alexnet(self, input_shape):
 		#K.set_image_dim_ordering('th')
 		model = Sequential()
-		# model.add(Conv2D(96,(3,3),strides=(1,1),input_shape=(32,32,3),padding='valid',activation='relu',kernel_initializer='uniform'))
-		model.add(Conv2D(96,(11,11),strides=(1,1),input_shape=input_shape,padding='same',activation='relu',kernel_initializer='uniform'))
-		model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
+		model.add(Conv2D(96,(3,3),strides=(1,1),input_shape=input_shape,padding='valid',activation=activation,kernel_initializer='uniform'))
+		#model.add(Conv2D(96,(11,11),strides=(1,1),input_shape=input_shape,padding='valid',activation=activation,kernel_initializer='uniform'))
+		#model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
 		model.add(Conv2D(256,(5,5),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
 		model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
 		model.add(Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
