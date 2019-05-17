@@ -117,9 +117,6 @@ class cnn_min_batch_GD():
 
 	def vgg(self, input_shape):
 		   # Build the network of vgg for 10 classes with massive dropout and weight decay as described in the paper.
-			
-		print('vgg')
-		print(input_shape)
 		model = Sequential()
 		weight_decay = 0.0005
 
@@ -208,24 +205,10 @@ class cnn_min_batch_GD():
 
 		return model
 
-	def inception(self):
-		input_img = Input(shape = (32, 32, 3))
-		l_1 = Conv2D(64, (1,1), padding='same', activation='relu')(input_img)
-		l_1 = Conv2D(64, (3,3), padding='same', activation='relu')(l_1)
-		l_2 = Conv2D(64, (1,1), padding='same', activation='relu')(input_img)
-		l_2 = Conv2D(64, (5,5), padding='same', activation='relu')(l_2)
-		l_3 = MaxPooling2D((3,3), strides=(1,1), padding='same')(input_img)
-		l_3 = Conv2D(64, (1,1), padding='same', activation='relu')(l_3)
-		output = keras.layers.concatenate([l_1, l_2, l_3], axis = 3)
-		output = Flatten()(output)
-		out    = Dense(10, activation='softmax')(output)
-		model = Model(inputs = input_img, outputs = out)
-		return model
-
 	def Alexnet(self, input_shape):
 		#K.set_image_dim_ordering('th')
 		model = Sequential()
-		model.add(Conv2D(96,(3,3),strides=(1,1),input_shape=input_shape,padding='valid',activation=activation,kernel_initializer='uniform'))
+		model.add(Conv2D(96,(3,3),strides=(1,1),input_shape=input_shape,padding='valid',activation='relu',kernel_initializer='uniform'))
 		#model.add(Conv2D(96,(11,11),strides=(1,1),input_shape=input_shape,padding='valid',activation=activation,kernel_initializer='uniform'))
 		#model.add(MaxPooling2D(pool_size=(3,3),strides=(2,2)))
 		model.add(Conv2D(256,(5,5),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
@@ -317,6 +300,8 @@ class cnn_min_batch_GD():
 		return model
 	
 	def __init__(self, shape_inp, modelType, act_fun, data_reg):
+		seed = 7
+		np.random.seed(seed) 
 		if modelType == 'resnet':
 			print('resnet')
 			self.network = self.resnet_v1(input_shape=shape_inp, depth=20)
@@ -324,9 +309,6 @@ class cnn_min_batch_GD():
 			# x = keras.layers.GlobalAveragePooling2D()(base_model.output)
 			# output = keras.layers.Dense(10, activation='softmax')(x)
 			# self.network = keras.models.Model(inputs=[base_model.input], outputs=[output])
-		elif modelType == 'incep':
-			self.network = self.inception()
-			#self.network = applications.inception_v3.InceptionV3(include_top=False, weights=None, input_tensor=None, input_shape=(32,32,3), pooling=None, classes=10)
 		elif modelType == 'vgg':
 			#self.network = applications.vgg16.VGG16( weights=None, include_top=True, classes=10, input_shape=(32,32,3))
 			self.network = self.vgg(input_shape = shape_inp)
